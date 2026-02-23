@@ -4,7 +4,7 @@
 # Check root privileges 
 # ---------------------
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run as root"
+  echo -e "\e[31mPlease run as root!\e[0m"
   exit 1
 fi
 
@@ -22,7 +22,7 @@ if [[ $yn =~ ^[Yy]$ ]]; then
   echo
 
   if [[ $PASSWORD != $PASSWORD_CONFIRM ]]; then
-    echo "Passwords do not match!"
+    echo -e "\e[31mPasswords do not match!\e[0m"
     exit 1
   fi
 
@@ -32,9 +32,16 @@ if [[ $yn =~ ^[Yy]$ ]]; then
   # set user password
   echo "${USERNAME}:${PASSWORD}" | chpasswd
 
-  # give user sudo privileges (update visudo)
-  echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
-  echo "User ${USERNAME} created and granted full permissions!"
+  # give user sudo privileges
+  SUDOERS_FILE="/etc/sudoers.d/wheel"
+  
+  if [ ! -f "$SUDOERS_FILE" ]; then
+    echo "Enabling sudo for wheel group..."
+    echo "%wheel ALL=(ALL) ALL" > "$SUDOERS_FILE"
+    chmod 440 "$SUDOERS_FILE"
+  else
+    echo -e "\e[31mWheel sudo already configured. Skipping.\e[32m"
+  fi
 fi
 
 
@@ -47,7 +54,7 @@ if [[ $yn =~ ^[Yy]$ ]]; then
   # update all packages first
   pacman -Syuu
   pacman -S git base-devel bat exa vim wget figlet
-  echo "Installed basic tools!"
+  echo -e "\e[32mInstalled basic tools!\e[0m"
 fi
 
 
@@ -67,17 +74,17 @@ if [[ $yn =~ ^[Yy]$ ]]; then
 
   # check if user exists
   if ! id "$TARGET_USER" >/dev/null 2>&1; then
-    echo "User '$TARGET_USER' does not exist! Aborting zsh setup."
+    echo -e "\e[31mUser '$TARGET_USER' does not exist! Aborting zsh setup.\e[0m"
     exit 1
   fi
 
   # check if yay is already installed
   if command -v yay >/dev/null 2>&1; then
-    echo "yay is already installed!"
+    echo -e "\e[31myay is already installed!\e[32m"
   else
     USER_HOME=$(eval echo "~$TARGET_USER")
   
-    sudo -u "$TARGET_USER" bash -c "
+    sudo -iu "$TARGET_USER" bash -c "
       cd $USER_HOME &&
       git clone https://aur.archlinux.org/yay.git &&
       cd yay &&
@@ -86,7 +93,7 @@ if [[ $yn =~ ^[Yy]$ ]]; then
       rm -rf yay
     "
     
-    echo "Installed yay!"
+    echo -e "\e[32mInstalled yay!\e[0m"
   fi
 fi
 
@@ -107,7 +114,7 @@ if [[ $yn =~ ^[Yy]$ ]]; then
 
   # check if user exists
   if ! id "$TARGET_USER" >/dev/null 2>&1; then
-    echo "User '$TARGET_USER' does not exist! Aborting zsh setup."
+    echo -e "\e[31mUser '$TARGET_USER' does not exist! Aborting zsh setup.\e[32m"
     exit 1
   fi
 
@@ -132,8 +139,8 @@ if [[ $yn =~ ^[Yy]$ ]]; then
   # install plugins
   pacman -S zsh-autosuggestions
   
-  echo "zsh and oh-my-zsh installed!"
+  echo -e "\e[32mzsh and oh-my-zsh installed!\e[0m"
 fi
 
-echo "Script Done!"
-exit 1
+echo -e "\e[32mScript Done!\e[0m"
+exit 0
