@@ -138,6 +138,7 @@ if [[ $yn =~ ^[Yy]$ ]]; then
 
   # install plugins
   pacman -S zsh-autosuggestions
+  sudo -iu "$TARGET_USER" git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
   
   echo -e "\e[32mzsh and oh-my-zsh installed!\e[0m"
 fi
