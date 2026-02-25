@@ -42,7 +42,7 @@ alias v="vim"
 alias c="clear"
 
 # formatted date and time
-alias ddate="date +'%R - %a, %B %d, %Y'"
+alias ddate="date +'%R - %a, %d. %B, %Y'"
 alias ttime="while true; do tput clear; date +'%H : %M : %S' | figlet ; sleep 1; done"
 
 # git
